@@ -1,0 +1,32 @@
+# Solo para probar la app en tu notebook antes de meter Terraform.
+# NO se usa en el despliegue: en VM-APP todo lo crea Terraform.
+#   docker compose -f docker-compose.local.yml up --build
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        GIT_SHA: local
+    environment:
+      ENVIRONMENT: local
+      APP_VERSION: dev
+    volumes:
+      - assettrack_data:/data
+    networks: [app-net]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on: [backend]
+    networks: [app-net]
+
+networks:
+  app-net:
+
+volumes:
+  assettrack_data:
