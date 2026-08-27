@@ -19,6 +19,10 @@ on:
         description: "Ruta del estado de Terraform, fuera del workspace del runner"
         required: true
         type: string
+      metrics_port:
+        description: "Puerto de loopback para /metrics"
+        required: true
+        type: number
       gates_bloqueantes:
         description: "true = el quality gate y el escaneo detienen el pipeline. Se usa en prod."
         required: false
@@ -258,7 +262,8 @@ jobs:
             -var="backend_image=${IMAGE_BACKEND}:${{ github.sha }}" \
             -var="frontend_image=${IMAGE_FRONTEND}:${{ github.sha }}" \
             -var="git_sha=${{ github.sha }}" \
-            -var="app_version=${{ github.ref_name }}"
+            -var="app_version=${{ github.ref_name }}" \
+            -var="backend_metrics_port=${{ inputs.metrics_port }}"
 
       - name: Terraform apply
         working-directory: terraform
