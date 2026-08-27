@@ -1,0 +1,26 @@
+# Caller para el entorno de desarrollo.
+name: CI/CD — dev
+
+on:
+  push:
+    branches: [developer]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+concurrency:
+  group: despliegue-dev
+  cancel-in-progress: false
+
+jobs:
+  pipeline:
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: dev
+      frontend_port: 8080
+      tfstate_path: /opt/tfstate/dev/terraform.tfstate
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write

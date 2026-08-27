@@ -1,0 +1,26 @@
+# Caller para produccion. A main solo se llega por Pull Request.
+name: CI/CD — prod
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+concurrency:
+  group: despliegue-prod
+  cancel-in-progress: false
+
+jobs:
+  pipeline:
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: prod
+      frontend_port: 80
+      tfstate_path: /opt/tfstate/prod/terraform.tfstate
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
