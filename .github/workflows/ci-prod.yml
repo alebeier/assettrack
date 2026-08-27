@@ -20,6 +20,7 @@ jobs:
       environment: prod
       frontend_port: 80
       tfstate_path: /opt/tfstate/prod/terraform.tfstate
+      gates_bloqueantes: true
     secrets: inherit
     permissions:
       contents: read

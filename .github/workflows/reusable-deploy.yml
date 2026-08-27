@@ -19,11 +19,20 @@ on:
         description: "Ruta del estado de Terraform, fuera del workspace del runner"
         required: true
         type: string
+      gates_bloqueantes:
+        description: "true = el quality gate y el escaneo detienen el pipeline. Se usa en prod."
+        required: false
+        default: false
+        type: boolean
     secrets:
       SONAR_TOKEN:
         required: true
       SONAR_HOST_URL:
         required: true
+
+permissions:
+  contents: read
+  packages: write
 
 env:
   REGISTRY: ghcr.io
@@ -61,15 +70,28 @@ jobs:
             --cov-report=term \
             --cov-report=xml:coverage.xml
 
-      - name: Analisis SonarQube con quality gate
+      - name: Analisis SonarQube
+        id: sonar
+        continue-on-error: ${{ !inputs.gates_bloqueantes }}
         uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
-            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.wait=${{ inputs.gates_bloqueantes }}
             -Dsonar.branch.name=${{ github.ref_name }}
+
+      - name: Resultado del quality gate
+        if: always()
+        run: |
+          if [ "${{ steps.sonar.outcome }}" = "success" ]; then
+            echo "Quality gate: OK" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Quality gate: NO SUPERADO" >> "$GITHUB_STEP_SUMMARY"
+            echo "Modo bloqueante: ${{ inputs.gates_bloqueantes }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "Detalle en ${{ secrets.SONAR_HOST_URL }}/dashboard?id=assettrack" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Publicar reporte de cobertura
         if: always()
@@ -159,25 +181,42 @@ jobs:
           retention-days: 90
 
       # ----- Escaneo de vulnerabilidades -----
-      - name: Reporte informativo de vulnerabilidades
+      - name: Reporte de vulnerabilidades
         run: |
-          trivy image --scanners vuln --severity HIGH,CRITICAL \
-            --format table "${IMAGE_BACKEND}:${{ github.sha }}" || true
-          trivy image --scanners vuln --severity HIGH,CRITICAL \
-            --format table "${IMAGE_FRONTEND}:${{ github.sha }}" || true
+          for img in "${IMAGE_BACKEND}" "${IMAGE_FRONTEND}"; do
+            echo "===== ${img} ====="
+            trivy image --scanners vuln --severity HIGH,CRITICAL \
+              --format table "${img}:${{ github.sha }}" || true
+          done
+
+      - name: Resumen de vulnerabilidades
+        if: always()
+        run: |
+          {
+            echo "### Escaneo de vulnerabilidades"
+            echo ""
+            echo "| Imagen | HIGH | CRITICAL |"
+            echo "|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for img in "${IMAGE_BACKEND}" "${IMAGE_FRONTEND}"; do
+            trivy image --scanners vuln --severity HIGH,CRITICAL \
+              --format json -o /tmp/tv.json "${img}:${{ github.sha }}" 2>/dev/null || true
+            alto=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity=="HIGH")] | length' /tmp/tv.json 2>/dev/null || echo 0)
+            crit=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length' /tmp/tv.json 2>/dev/null || echo 0)
+            echo "| \`$(basename ${img})\` | ${alto} | ${crit} |" >> "$GITHUB_STEP_SUMMARY"
+          done
 
       - name: Gate de seguridad — CRITICAL con fix disponible
+        continue-on-error: ${{ !inputs.gates_bloqueantes }}
         run: |
-          trivy image --scanners vuln \
-            --severity CRITICAL \
-            --ignore-unfixed \
-            --exit-code 1 \
-            "${IMAGE_BACKEND}:${{ github.sha }}"
-          trivy image --scanners vuln \
-            --severity CRITICAL \
-            --ignore-unfixed \
-            --exit-code 1 \
-            "${IMAGE_FRONTEND}:${{ github.sha }}"
+          for img in "${IMAGE_BACKEND}" "${IMAGE_FRONTEND}"; do
+            trivy image --scanners vuln \
+              --severity CRITICAL \
+              --ignore-unfixed \
+              --exit-code 1 \
+              "${img}:${{ github.sha }}"
+          done
 
       # ----- Opcional: Dependency-Track -----
       - name: Subir SBOM a Dependency-Track
