@@ -140,7 +140,7 @@ jobs:
             GIT_SHA=${{ github.sha }}
             APP_VERSION=${{ github.ref_name }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
 
       - name: Build y push del frontend
         uses: docker/build-push-action@v6
@@ -154,7 +154,7 @@ jobs:
           build-args: |
             GIT_SHA=${{ github.sha }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
 
       # ----- SBOM: entregable del trabajo -----
       - name: Generar SBOM en formato CycloneDX
