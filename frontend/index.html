@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AssetTrack — Inventario de activos</title>
+<style>
+  :root {
+    --bg: #0f1720; --panel: #17222e; --line: #24313f;
+    --txt: #e6edf3; --muted: #8b9bab; --accent: #4d9de0;
+    --alta: #e05d5d; --media: #e0a24d; --baja: #4de08a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 2rem 1.5rem;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--txt);
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: baseline;
+           flex-wrap: wrap; gap: .75rem; margin-bottom: 1.5rem; }
+  h1 { margin: 0; font-size: 1.6rem; letter-spacing: -.02em; }
+  h1 span { color: var(--accent); }
+  .meta { font-size: .78rem; color: var(--muted); font-family: ui-monospace, monospace; }
+  .meta b { color: var(--txt); font-weight: 600; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+           gap: .75rem; margin-bottom: 1.5rem; }
+  .card { background: var(--panel); border: 1px solid var(--line);
+          border-radius: 10px; padding: .9rem 1rem; }
+  .card .n { font-size: 1.9rem; font-weight: 600; line-height: 1; }
+  .card .l { font-size: .72rem; color: var(--muted); text-transform: uppercase;
+             letter-spacing: .06em; margin-top: .35rem; }
+
+  form { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+         padding: 1rem; display: grid; gap: .6rem;
+         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 1.5rem; }
+  input, select, button {
+    font: inherit; padding: .55rem .7rem; border-radius: 7px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--txt);
+  }
+  button { background: var(--accent); color: #06131f; border: none;
+           font-weight: 600; cursor: pointer; }
+  button:hover { filter: brightness(1.1); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--panel);
+          border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: .65rem .85rem; border-bottom: 1px solid var(--line);
+           font-size: .88rem; }
+  th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--muted); }
+  tr:last-child td { border-bottom: none; }
+  .tag { padding: .15rem .5rem; border-radius: 20px; font-size: .72rem; font-weight: 600; }
+  .tag.alta  { background: rgba(224,93,93,.18);  color: var(--alta); }
+  .tag.media { background: rgba(224,162,77,.18); color: var(--media); }
+  .tag.baja  { background: rgba(77,224,138,.18); color: var(--baja); }
+  .del { background: none; color: var(--muted); border: none; cursor: pointer;
+         font-size: 1rem; padding: 0 .3rem; }
+  .del:hover { color: var(--alta); }
+  .vacio { text-align: center; color: var(--muted); padding: 2rem; font-size: .9rem; }
+  .sin { color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Asset<span>Track</span></h1>
+    <div class="meta" id="meta">cargando…</div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <form id="form">
+    <input  id="nombre" placeholder="srv-radar-01" required minlength="2">
+    <select id="tipo">
+      <option value="servidor">Servidor</option>
+      <option value="servicio">Servicio</option>
+      <option value="red">Red</option>
+      <option value="almacenamiento">Almacenamiento</option>
+    </select>
+    <select id="criticidad">
+      <option value="alta">Criticidad alta</option>
+      <option value="media" selected>Criticidad media</option>
+      <option value="baja">Criticidad baja</option>
+    </select>
+    <input  id="responsable" placeholder="Responsable (opcional)">
+    <button type="submit">Agregar activo</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr><th>Nombre</th><th>Tipo</th><th>Criticidad</th><th>Responsable</th><th></th></tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+async function cargarMeta() {
+  try {
+    const r = await fetch('/api/version');
+    const v = await r.json();
+    $('meta').innerHTML =
+      `entorno <b>${v.environment}</b> · commit <b>${v.git_sha.slice(0,7)}</b> · uptime <b>${Math.floor(v.uptime_segundos)}s</b>`;
+  } catch { $('meta').textContent = 'backend no disponible'; }
+}
+
+async function cargarStats() {
+  const r = await fetch('/api/stats');
+  const s = await r.json();
+  $('stats').innerHTML = `
+    <div class="card"><div class="n">${s.total}</div><div class="l">Total</div></div>
+    <div class="card"><div class="n" style="color:var(--alta)">${s.por_criticidad.alta}</div><div class="l">Criticidad alta</div></div>
+    <div class="card"><div class="n" style="color:var(--media)">${s.por_criticidad.media}</div><div class="l">Criticidad media</div></div>
+    <div class="card"><div class="n" style="color:var(--baja)">${s.por_criticidad.baja}</div><div class="l">Criticidad baja</div></div>`;
+}
+
+async function cargarAssets() {
+  const r = await fetch('/api/assets');
+  const items = await r.json();
+  if (!items.length) {
+    $('tbody').innerHTML = '<tr><td colspan="5" class="vacio">Todavía no hay activos registrados.</td></tr>';
+    return;
+  }
+  $('tbody').innerHTML = items.map(a => `
+    <tr>
+      <td><strong>${a.nombre}</strong></td>
+      <td>${a.tipo}</td>
+      <td><span class="tag ${a.criticidad}">${a.criticidad}</span></td>
+      <td>${a.responsable ? a.responsable : '<span class="sin">sin asignar</span>'}</td>
+      <td style="text-align:right"><button class="del" data-id="${a.id}" title="Eliminar">✕</button></td>
+    </tr>`).join('');
+}
+
+async function refrescar() {
+  await Promise.all([cargarStats(), cargarAssets()]);
+}
+
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const payload = {
+    nombre: $('nombre').value.trim(),
+    tipo: $('tipo').value,
+    criticidad: $('criticidad').value,
+    responsable: $('responsable').value.trim() || null
+  };
+  const r = await fetch('/api/assets', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (r.ok) { $('form').reset(); refrescar(); }
+  else { alert('No se pudo crear el activo (código ' + r.status + ')'); }
+});
+
+$('tbody').addEventListener('click', async e => {
+  const btn = e.target.closest('.del');
+  if (!btn) return;
+  await fetch('/api/assets/' + btn.dataset.id, { method: 'DELETE' });
+  refrescar();
+});
+
+cargarMeta();
+refrescar();
+setInterval(cargarMeta, 10000);
+</script>
+</body>
+</html>
