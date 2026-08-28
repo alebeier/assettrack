@@ -36,8 +36,7 @@ GET    /metrics             formato Prometheus
 ```
 
 Los datos viven en SQLite sobre un volumen de Docker, así que sobreviven a que se
-destruya y recree el contenedor. Es una de las cosas que vale la pena mostrar en
-vivo.
+destruya y recree el contenedor.
 
 ---
 
@@ -78,10 +77,6 @@ Las dos VMs tienen dos placas de red: NAT para salir a internet y host-only en
 | Monitoreo | Prometheus + Grafana + cAdvisor + node-exporter |
 | Gestión visual | Portainer |
 
-Un solo lenguaje a propósito. Usar dos habría significado dos Dockerfiles, dos
-configuraciones de cobertura, dos herramientas de SBOM y el doble de superficie de
-falla, sin agregar nada al objetivo.
-
 ---
 
 ## El flujo de trabajo
@@ -117,7 +112,7 @@ bloquean o no. Sin eso serían doscientas líneas duplicadas.
 6. Corre `terraform init`, `plan` y `apply` contra VM-APP
 7. Hace un smoke test contra `/api/version` con reintentos
 
-El tag por SHA no es cosmético: hace que cada despliegue sea trazable hasta el commit
+El tag por SHA hace que cada despliegue sea trazable hasta el commit
 exacto, y que un rollback sea reaplicar Terraform con un SHA anterior.
 
 ---
@@ -144,7 +139,7 @@ parche upstream, y si bloquearas por eso el pipeline quedaría rojo permanenteme
 por algo que no podés arreglar. A la semana estarías ignorando el gate, y un control
 que siempre falla no es un control.
 
-Esto no quedó en la teoría. Trivy encontró **CVE-2026-31789**, un heap buffer
+**Experiencia durante la práctica:** Trivy encontró **CVE-2026-31789**, un heap buffer
 overflow en OpenSSL con severidad crítica, en la imagen base del frontend
 (`nginx:1.27-alpine`, con `libssl3 3.3.3-r0`). El gate detuvo el despliegue a
 producción. Se resolvió actualizando la base a `nginx:1.29-alpine`, que trae OpenSSL
@@ -345,34 +340,6 @@ se limpia en cada corrida), sino en `/opt/tfstate/{dev,prod,monitoring}/` dentro
 VM-CI. Los archivos `.tfstate` pueden contener credenciales en texto plano, así que
 están en el `.gitignore`.
 
----
-
-## Cosas que nos costaron y por qué las contamos
-
-Ninguna de estas fue culpa de una mala decisión de diseño. Todas fueron cosas que
-solo se descubren cuando el sistema corre de verdad.
-
-**El disco se llenó.** El caché de buildx con `mode=max` guarda todas las capas
-intermedias. Después de unas cuantas corridas, VM-CI se quedó sin espacio y el runner
-empezó a crashear en loop con errores que no mencionaban el disco. Lo bajamos a
-`mode=min` y agregamos un `docker system prune` semanal por cron.
-
-**GHCR rechazaba el push.** Habíamos creado los packages a mano con un token
-personal, para probar. Un package creado así no queda vinculado a ningún
-repositorio, y por lo tanto el `GITHUB_TOKEN` del workflow no tiene autoridad sobre
-él, sin importar los permisos que le des al repo. Se resolvió borrándolos y dejando
-que el pipeline los creara.
-
-**El quality gate devolvía `NONE` en lugar de `OK`.** Estuvimos varias iteraciones
-ajustando condiciones del gate sin resultado. El problema era otro: le estábamos
-pasando `-Dsonar.branch.name` al scanner, y la edición Community de SonarQube no
-soporta análisis por rama. El proyecto quedaba sin un estado evaluable y el scanner
-interpretaba cualquier cosa distinta de `OK` como fallo. Sacar ese parámetro lo
-resolvió de una.
-
-**HCL no permite bloques de una línea con varios argumentos.** Terraform acepta
-`labels { label = "x" }` pero rechaza `volumes { host_path = "/proc" container_path =
-"/host/proc" }`. Hay que expandirlos.
 
 ---
 
@@ -383,20 +350,4 @@ resolvió de una.
 - Dockerfiles y artefactos publicados en `ghcr.io/alebeier/assettrack-{backend,frontend}`
 - SBOMs en CycloneDX y SPDX, disponibles como artefactos de cada ejecución del pipeline
 - Capturas del dashboard y de las corridas: `docs/evidencias/`
-
----
-
-## Qué haríamos distinto con más tiempo
-
-Los tags de imagen por SHA ya permiten rollback, pero no hay un mecanismo automático:
-hay que correr Terraform a mano con el SHA anterior. Un job de rollback con
-`workflow_dispatch` sería una mejora barata.
-
-El quality gate quedó configurado con criterios laxos porque el proyecto es chico y
-todo el código es nuevo. En un repositorio con historia, "Clean as You Code" tiene
-mucho más sentido y lo dejaríamos como viene.
-
-Tampoco hay alertas: Prometheus recolecta y Grafana muestra, pero nadie se entera si
-algo se cae. Alertmanager sería el paso siguiente natural.
-
 
