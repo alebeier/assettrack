@@ -104,8 +104,10 @@ async function cargarMeta() {
   try {
     const r = await fetch('/api/version');
     const v = await r.json();
+    const color = v.environment === 'prod' ? '#e05d5d' : '#4de08a';
     $('meta').innerHTML =
-      `entorno <b>${v.environment}</b> · commit <b>${v.git_sha.slice(0,7)}</b> · uptime <b>${Math.floor(v.uptime_segundos)}s</b>`;
+      `<span style="background:${color};color:#06131f;padding:.2rem .6rem;border-radius:20px;font-weight:700">${v.environment.toUpperCase()}</span> ` +
+      `commit <b>${v.git_sha.slice(0,7)}</b> · uptime <b>${Math.floor(v.uptime_segundos)}s</b>`;
   } catch { $('meta').textContent = 'backend no disponible'; }
 }
 

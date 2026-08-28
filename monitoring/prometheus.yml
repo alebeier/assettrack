@@ -1,0 +1,32 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    origen: vm-app
+
+scrape_configs:
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ['127.0.0.1:9090']
+
+  # Metricas del host: CPU, memoria, disco
+  - job_name: node
+    static_configs:
+      - targets: ['127.0.0.1:9100']
+
+  # Metricas por contenedor
+  - job_name: cadvisor
+    static_configs:
+      - targets: ['127.0.0.1:8081']
+
+  # AssetTrack: el backend publica /metrics solo en loopback
+  - job_name: assettrack
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['127.0.0.1:8000']
+        labels:
+          environment: dev
+      - targets: ['127.0.0.1:8010']
+        labels:
+          environment: prod

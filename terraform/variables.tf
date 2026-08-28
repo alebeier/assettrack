@@ -40,3 +40,8 @@ variable "app_version" {
   type        = string
   default     = "0.1.0"
 }
+
+variable "backend_metrics_port" {
+  description = "Puerto de loopback donde el backend expone /metrics para Prometheus."
+  type        = number
+}

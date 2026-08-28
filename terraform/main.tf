@@ -61,6 +61,14 @@ resource "docker_container" "backend" {
     "DB_PATH=/data/assettrack.db",
   ]
 
+  # Solo 127.0.0.1: Prometheus (network_mode host) llega,
+  # pero desde fuera de la VM sigue inaccesible.
+  ports {
+    internal = 8000
+    external = var.backend_metrics_port
+    ip       = "127.0.0.1"
+  }
+
   volumes {
     volume_name    = docker_volume.data.name
     container_path = "/data"
