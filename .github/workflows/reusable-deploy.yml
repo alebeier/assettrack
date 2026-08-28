@@ -84,7 +84,6 @@ jobs:
         with:
           args: >
             -Dsonar.qualitygate.wait=${{ inputs.gates_bloqueantes }}
-            -Dsonar.branch.name=${{ github.ref_name }}
 
       - name: Resultado del quality gate
         if: always()
