@@ -1,21 +1,86 @@
 {
-  "title": "AssetTrack — Aplicación e Infraestructura",
-  "uid": "assettrack-main",
-  "timezone": "browser",
-  "schemaVersion": 39,
-  "version": 1,
-  "refresh": "10s",
-  "time": { "from": "now-30m", "to": "now" },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Dashboard para monitoreo de la infraestructura",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
   "panels": [
     {
-      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": [],
       "title": "Negocio — Inventario de activos",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
+      "type": "row"
     },
     {
-      "type": "stat",
-      "title": "Activos por criticidad",
-      "gridPos": { "h": 6, "w": 10, "x": 0, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 10,
+        "x": 0,
+        "y": 1
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.5.1",
       "targets": [
         {
           "expr": "assettrack_assets_total",
@@ -23,24 +88,53 @@
           "refId": "A"
         }
       ],
+      "title": "Activos por criticidad",
+      "type": "stat"
+    },
+    {
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
-          "unit": "short"
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
         },
         "overrides": []
       },
+      "gridPos": {
+        "h": 6,
+        "w": 7,
+        "x": 10,
+        "y": 1
+      },
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "auto",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
-      }
-    },
-    {
-      "type": "piechart",
-      "title": "Distribución de criticidad (dev)",
-      "gridPos": { "h": 6, "w": 7, "x": 10, "y": 1 },
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.1",
       "targets": [
         {
           "expr": "assettrack_assets_total{environment=\"dev\"}",
@@ -48,15 +142,58 @@
           "refId": "A"
         }
       ],
-      "options": {
-        "legend": { "displayMode": "list", "placement": "right", "showLegend": true },
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
-      }
+      "title": "Distribución de criticidad (dev)",
+      "type": "piechart"
     },
     {
-      "type": "stat",
-      "title": "Activos sin responsable",
-      "gridPos": { "h": 6, "w": 7, "x": 17, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 7,
+        "x": 17,
+        "y": 1
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.5.1",
       "targets": [
         {
           "expr": "assettrack_assets_sin_responsable",
@@ -64,35 +201,98 @@
           "refId": "A"
         }
       ],
+      "title": "Activos sin responsable",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "panels": [],
+      "title": "Aplicación — Tráfico y latencia",
+      "type": "row"
+    },
+    {
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 1 },
-              { "color": "red", "value": 5 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
             ]
           },
-          "unit": "short"
+          "unit": "reqps"
         },
         "overrides": []
       },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
-      }
-    },
-    {
-      "type": "row",
-      "title": "Aplicación — Tráfico y latencia",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 }
-    },
-    {
-      "type": "timeseries",
-      "title": "Requests por segundo",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.1",
       "targets": [
         {
           "expr": "sum by (environment, endpoint) (rate(assettrack_http_requests_total[2m]))",
@@ -100,15 +300,86 @@
           "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } },
-        "overrides": []
-      }
+      "title": "Requests por segundo",
+      "type": "timeseries"
     },
     {
-      "type": "timeseries",
-      "title": "Latencia p95",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.1",
       "targets": [
         {
           "expr": "histogram_quantile(0.95, sum by (le, environment) (rate(assettrack_http_request_duration_seconds_bucket[2m])))",
@@ -116,152 +387,588 @@
           "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "s", "custom": { "lineWidth": 2, "fillOpacity": 10 } },
-        "overrides": []
-      }
+      "title": "Latencia p95",
+      "type": "timeseries"
     },
     {
-      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "panels": [],
       "title": "Infraestructura — VM-APP",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 }
+      "type": "row"
     },
     {
-      "type": "gauge",
-      "title": "CPU del host",
-      "gridPos": { "h": 7, "w": 6, "x": 0, "y": 17 },
-      "targets": [
-        {
-          "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[2m])) * 100)",
-          "legendFormat": "CPU",
-          "refId": "A"
-        }
-      ],
+      "datasource": {
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
-          "min": 0,
+          "mappings": [],
           "max": 100,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 70 },
-              { "color": "red", "value": 90 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
             ]
-          }
+          },
+          "unit": "percent"
         },
-        "overrides": []
-      }
-    },
-    {
-      "type": "gauge",
-      "title": "Memoria usada",
-      "gridPos": { "h": 7, "w": 6, "x": 6, "y": 17 },
-      "targets": [
-        {
-          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
-          "legendFormat": "RAM",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 75 },
-              { "color": "red", "value": 90 }
-            ]
-          }
-        },
-        "overrides": []
-      }
-    },
-    {
-      "type": "gauge",
-      "title": "Disco usado",
-      "gridPos": { "h": 7, "w": 6, "x": 12, "y": 17 },
-      "targets": [
-        {
-          "expr": "(1 - (node_filesystem_avail_bytes{mountpoint=\"/host/root\"} / node_filesystem_size_bytes{mountpoint=\"/host/root\"})) * 100",
-          "legendFormat": "Disco",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 75 },
-              { "color": "red", "value": 90 }
-            ]
-          }
-        },
-        "overrides": []
-      }
-    },
-    {
-      "type": "stat",
-      "title": "Contenedores activos",
-      "gridPos": { "h": 7, "w": 6, "x": 18, "y": 17 },
-      "targets": [
-        {
-          "expr": "count(container_last_seen{name=~\"assettrack.*|monitoring.*\"})",
-          "legendFormat": "Contenedores",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "blue" } },
         "overrides": []
       },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 0,
+        "y": 17
+      },
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
-      }
-    },
-    {
-      "type": "timeseries",
-      "title": "CPU por contenedor",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.5.1",
       "targets": [
         {
-          "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name=~\"assettrack.*|monitoring.*\"}[2m])) * 100",
-          "legendFormat": "{{name}}",
+          "editorMode": "builder",
+          "expr": "100 * avg(1 - rate(node_cpu_seconds_total{mode=\"idle\"}[1m])) by (instance)",
+          "legendFormat": "__auto",
+          "range": true,
           "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "percent", "custom": { "lineWidth": 2, "fillOpacity": 5 } },
-        "overrides": []
-      }
+      "title": "Uso de CPU (%)",
+      "type": "gauge"
     },
     {
-      "type": "timeseries",
-      "title": "Memoria por contenedor",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 75
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 6,
+        "y": 17
+      },
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.5.1",
       "targets": [
         {
-          "expr": "container_memory_working_set_bytes{name=~\"assettrack.*|monitoring.*\"}",
-          "legendFormat": "{{name}}",
+          "editorMode": "code",
+          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+          "legendFormat": "RAM",
+          "range": true,
           "refId": "A"
         }
       ],
+      "title": "Memoria ocupada (%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
-        "defaults": { "unit": "bytes", "custom": { "lineWidth": 2, "fillOpacity": 5 } },
+        "defaults": {
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
         "overrides": []
-      }
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 12,
+        "y": 17
+      },
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.5.1",
+      "targets": [
+        {
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "100*(1 - node_filesystem_avail_bytes{mountpoint=\"/\", instance=\"127.0.0.1:9100\"} / node_filesystem_size_bytes{mountpoint=\"/\"})",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "legendFormat": "Disco",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Disco ocupado (%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 18,
+        "y": 17
+      },
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.5.1",
+      "targets": [
+        {
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "(node_filesystem_avail_bytes{mountpoint=\"/\", instance=\"127.0.0.1:9100\"} * 100) / node_filesystem_size_bytes{mountpoint=\"/\"}",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "legendFormat": "Disco",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Disco libre (%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 24
+      },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "100 * avg(1 - rate(node_cpu_seconds_total{mode=\"idle\"}[1m])) by (instance)",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Uso de CPU (%)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 24
+      },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Memoria ocupada (%)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "100*(1 - node_filesystem_avail_bytes{mountpoint=\"/\", instance=\"127.0.0.1:9100\"} / node_filesystem_size_bytes{mountpoint=\"/\"})",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Uso de disco (%)",
+      "type": "timeseries"
     }
-  ]
+  ],
+  "preload": false,
+  "refresh": "10s",
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "AssetTrack — Aplicación e Infraestructura",
+  "version": 12,
+  "weekStart": ""
 }
