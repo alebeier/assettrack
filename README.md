@@ -174,7 +174,16 @@ El dashboard tiene tres bloques:
 
 - **Negocio**: activos por criticidad, distribución, activos sin responsable
 - **Aplicación**: requests por segundo y latencia p95, separados por entorno
-- **Infraestructura**: CPU, memoria y disco del host; CPU y memoria por contenedor
+- **Infraestructura**: CPU, memoria y disco del host
+
+### Pantalla de Monitoreo del Negocio
+![Monitoreo del Negocio](docs/dashboard-negocio.png)
+
+### Pantalla de Monitoreo de la Aplicación
+![Monitoreo de la Aplicación](docs/dashboard-app.png)
+
+### Pantalla de Monitoreo de la Infraestructura
+![Monitoreo de la infraestructura](docs/dashboard-infra.png)
 
 ---
 
