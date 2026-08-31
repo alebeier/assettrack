@@ -71,6 +71,7 @@ class TipoActivo(str, Enum):
     servicio = "servicio"
     red = "red"
     almacenamiento = "almacenamiento"
+    software = "software"
 
 
 class Criticidad(str, Enum):
