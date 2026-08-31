@@ -8,6 +8,8 @@ simple. La otra es todo lo que hay alrededor: cómo se testea, cómo se analiza,
 se empaqueta, cómo se despliega y cómo se monitorea. La segunda parte es la que
 importa.
 
+Repo: https://github.com/alebeier/assettrack
+
 ---
 ## Por qué un inventario de activos
 
@@ -349,6 +351,19 @@ se limpia en cada corrida), sino en `/opt/tfstate/{dev,prod,monitoring}/` dentro
 VM-CI. Los archivos `.tfstate` pueden contener credenciales en texto plano, así que
 están en el `.gitignore`.
 
+---
+## Cobertura de los tests
+- test_health_responde_ok:	El endpoint de salud, que usa el HEALTHCHECK del contenedor
+- test_version_expone_metadatos_del_despliegue:	Que la app reporte entorno, commit y uptime
+- test_listado_arranca_vacio:	Estado inicial limpio
+- test_alta_de_activo:	Creación exitosa, código 201
+- test_alta_rechaza_criticidad_invalida:	Validación de enum, código 422
+- test_alta_rechaza_nombre_corto:	Validación de longitud mínima
+- test_filtro_por_criticidad:	Query param de filtrado
+- test_borrado_de_activo:	Eliminación exitosa, código 204
+- test_borrado_inexistente_da_404:	Manejo de recurso no encontrado
+- test_stats_cuenta_por_criticidad:	Agregación correcta de conteos
+- test_metrics_expone_formato_prometheus:	Que las métricas de negocio se expongan bien
 
 ---
 
