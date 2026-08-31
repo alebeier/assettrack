@@ -73,6 +73,7 @@ class TipoActivo(str, Enum):
     almacenamiento = "almacenamiento"
     software = "software"
     consolas = "consolas"
+    impresora = "impresora"
 
 
 class Criticidad(str, Enum):
